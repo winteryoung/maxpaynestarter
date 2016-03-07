@@ -9,13 +9,14 @@ def read_ver()
   end
 end
 
+ver = read_ver()
+target_name = "maxpaynestarter-#{ver}"
+
 task :package do
   sh "mvn clean package"
 end
 
-task :release do
-  ver = read_ver()
-  target_name = "maxpaynestarter-#{ver}"
+task :release => :package do
   release_dir = "release/#{target_name}"
   rm_rf 'release'
   mkdir_p release_dir
@@ -31,4 +32,8 @@ task :release do
   DOC
   mv "#{target_name}.7z", ".."
   cd cwd
+end
+
+task :local => :package do
+  cp "target/#{target_name}.jar", 'c:/games/max payne/maxpaynestarter.jar'
 end
