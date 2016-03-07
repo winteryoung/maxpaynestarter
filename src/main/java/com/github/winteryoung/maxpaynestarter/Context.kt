@@ -6,6 +6,5 @@ package com.github.winteryoung.maxpaynestarter
  */
 data class Context(
         var metMaxPayneStarterWindow: Boolean = false,
-        var cancel: Boolean = false,
-        var restartLoopWindows: Boolean = false
+        var cancel: Boolean = false
 )

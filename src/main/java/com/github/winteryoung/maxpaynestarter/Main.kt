@@ -11,6 +11,7 @@ fun main(args: Array<String>) {
 
     println("Starting Max Payne...")
     ProcessBuilder("MaxPayne.exe", if (args.size > 0) args[0] else "").start()
+
     println("Detecting Max Payne game window...")
     Timer().let { timer ->
         timer.schedule(object : TimerTask() {
@@ -65,7 +66,6 @@ private fun procWindow(wnd: WinDef.HWND, context: Context): String {
                 }
                 "#32770" -> {
                     context.metMaxPayneStarterWindow = true
-                    context.restartLoopWindows = true
                     return "maxPayne"
                 }
             }
