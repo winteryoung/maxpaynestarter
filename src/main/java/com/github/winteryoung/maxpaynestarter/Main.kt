@@ -7,26 +7,33 @@ import com.sun.jna.platform.win32.WinUser
 import java.util.*
 
 fun main(args: Array<String>) {
-    val context = Context()
+    var metMaxPayneStarterWindow = false
 
     println("Starting Max Payne...")
     ProcessBuilder("MaxPayne.exe", if (args.size > 0) args[0] else "").start()
 
     println("Detecting Max Payne game window...")
-    Timer().let { timer ->
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                when (loopWindows(context)) {
-                    "cancel" -> {
+    val timer = Timer()
+    timer.schedule(object : TimerTask() {
+        override fun run() {
+            when (loopWindows()) {
+                "maxPayneInGame" -> {
+                    timer.cancel()
+                }
+                "maxPayne" -> {
+                    metMaxPayneStarterWindow = true
+                }
+                "notMaxPayne" -> {
+                    if (metMaxPayneStarterWindow) {
                         timer.cancel()
                     }
                 }
             }
-        }, 0, 1000)
-    }
+        }
+    }, 0, 1000)
 }
 
-private fun loopWindows(context: Context): String {
+private fun loopWindows(): String {
     val windows = ArrayList<WinDef.HWND>().apply {
         User32.INSTANCE.EnumWindows({ wnd, data ->
             add(wnd)
@@ -35,21 +42,20 @@ private fun loopWindows(context: Context): String {
     }
 
     for (window in windows) {
-        when (procWindow(window, context)) {
+        when (procWindow(window)) {
             "maxPayne" -> {
-                return "continue"
+                return "maxPayne"
+            }
+            "maxPayneInGame" -> {
+                return "maxPayneInGame"
             }
         }
     }
 
-    if (context.metMaxPayneStarterWindow) {
-        context.cancel = true
-    }
-
-    return if (context.cancel) "cancel" else "continue"
+    return "notMaxPayne"
 }
 
-private fun procWindow(wnd: WinDef.HWND, context: Context): String {
+private fun procWindow(wnd: WinDef.HWND): String {
     val wndClass = getClassName(wnd)
     val text = getWindowText(wnd)
 
@@ -58,14 +64,12 @@ private fun procWindow(wnd: WinDef.HWND, context: Context): String {
             when (wndClass) {
                 "Afx:400000:3" -> {
                     println("Detected Max Payne")
-                    context.cancel = true
                     Thread.sleep(5000)
                     removeWndBorder(wnd)
                     maxMaxPayneWnd(wnd)
-                    return "maxPayne"
+                    return "maxPayneInGame"
                 }
                 "#32770" -> {
-                    context.metMaxPayneStarterWindow = true
                     return "maxPayne"
                 }
             }
