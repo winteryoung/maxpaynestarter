@@ -1,4 +1,4 @@
-Fix the Max Payne 1 window does not run in full screen mode problem under Windows 10.
+Fix the Max Payne 1 window does not run in full screen mode problem under Windows 10. Why this fix? This fix is compatible with RivaTuner Statistics Server (RTSS). On the other hand SweetFX doesn't.
 
 # Installation
 
